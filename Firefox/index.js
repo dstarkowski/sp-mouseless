@@ -39,7 +39,7 @@ var panel = panels.Panel({
   contentURL: './search-panel.htm',
   contentScriptFile: './search-panel.js',
   width: 400,
-  height: 40,
+  height: 280,
   onHide: handleHide
 });
 
