@@ -9,9 +9,12 @@ function getScopeUrl(scope) {
 	if (scope.toLowerCase() == 'web') {
 		return unsafeWindow._spPageContextInfo.webAbsoluteUrl;
 	}
+
 	if (scope.toLowerCase() == 'site') {
 		return unsafeWindow._spPageContextInfo.siteAbsoluteUrl;
 	}
+	
+	return ''; 
 }
 
 navigate(self.options.scope, self.options.url);

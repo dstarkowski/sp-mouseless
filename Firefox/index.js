@@ -1,18 +1,47 @@
+var navigationCommands = {
+  'site contents':
+    { scope: 'web', url: '/_layouts/viewlsts.aspx' },
+  'root web':
+    { scope: 'site', url: '/' },
+  'root site':
+    { scope: 'global', url: '/' },
+  'settings':
+    { scope: 'web', url: '/_layouts/settings.aspx' },
+  'web features':
+    { scope: 'web', url: '/_layouts/managefeatures.aspx' },
+  'site features':
+    { scope: 'site', url: '/_layouts/managefeatures.aspx?Scope=Site' },
+  'home page':
+    { scope: 'web', url: '/' },
+  'site settings':
+    { scope: 'site', url: '/_layouts/settings.aspx' },
+  'web permissions':
+    { scope: 'web', url: '/_layouts/user.aspx' },
+  'permission levels':
+    { scope: 'web', url: '/_layouts/role.aspx' },
+  'web groups':
+    { scope: 'web', url: '/_layouts/groups.aspx' },
+  'web users':
+    { scope: 'web', url: '/_layouts/user.aspx' },
+  'web columns':
+    { scope: 'web', url: '/_layouts/mngfield.aspx' },
+  'web content types':
+    { scope: 'web', url: '/_layouts/mngctype.aspx' }
+};
+
 var { Hotkey } = require('sdk/hotkeys');
 
-var data = require('sdk/self').data;
 var tabs = require('sdk/tabs');
-
+var buttons = require('sdk/ui/button/toggle');
 var panels = require('sdk/panel');
+
 var panel = panels.Panel({
-  contentURL: data.url('search-panel.htm'),
-  contentScriptFile: data.url('search-panel.js'),
+  contentURL: './search-panel.htm',
+  contentScriptFile: './search-panel.js',
   width: 400,
   height: 40,
   onHide: handleHide
 });
-
-var buttons = require('sdk/ui/button/toggle');
 
 var button = buttons.ToggleButton({
   id: 'show-panel',
@@ -42,10 +71,8 @@ panel.on('show', function() {
 });
 
 function navigate(scope, url) {
-  console.log(scope);
-  console.log(url);
   tabs.activeTab.attach({
-    contentScriptFile: data.url('mouseless.js'),
+    contentScriptFile: './navigate.js',
     contentScriptOptions: {
       'scope': scope,
       'url': url
@@ -54,17 +81,11 @@ function navigate(scope, url) {
 };
   
 panel.port.on('text-entered', function(text) {
-  if (text == 'site content' || text == 'site contents') {
-    navigate('web', '/_layouts/viewlsts.aspx');
-  }
-  if (text == 'settings') {
-    navigate('web', '/_layouts/settings.aspx');
-  }
-  if (text == 'web features') {
-    navigate('web', '/_layouts/managefeatures.aspx');
-  }
-  if (text == 'site features') {
-    navigate('site', '/_layouts/managefeatures.aspx?Scope=Site');
+  var commandText = text.trim().replace('  ', ' ').toLowerCase();
+  var navigationCommand = navigationCommands[commandText];
+
+  if (typeof(navigationCommand) != 'undefined') {
+    navigate(navigationCommand.scope, navigationCommand.url);
   }
   panel.hide();
 });
