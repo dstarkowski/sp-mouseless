@@ -1,7 +1,7 @@
 {
   "title": "SPMouseless",
   "name": "spmouseless",
-  "version": "0.0.1",
+  "version": "0.2.1",
   "description": "SharePoint navigation keyboard shourtcuts",
   "main": "index.js",
   "author": "dstarkowski",
@@ -9,6 +9,7 @@
     "firefox": ">=38.0a1"
   },
   "license": "MIT",
+  "permissions": {"private-browsing": true},
   "keywords": [
     "jetpack"
   ]
