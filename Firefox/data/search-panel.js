@@ -9,4 +9,5 @@ input.addEventListener('keyup', function onkeyup(event) {
 
 self.port.on('show', function onShow() {
 	input.focus();
+	input.select();
 });
