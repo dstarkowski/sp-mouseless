@@ -9,7 +9,7 @@
     "firefox": ">=38.0a1"
   },
   "license": "MIT",
-  "permissions": {"private-browsing": true},
+  "permissions": { "private-browsing": true },
   "keywords": [
     "jetpack"
   ]
