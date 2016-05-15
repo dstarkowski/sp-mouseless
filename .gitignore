@@ -1,0 +1,5 @@
+run.ps1
+/Firefox/node_modules/*
+/Firefox/lib/*.js
+/Firefox/data/*.js
+*js.map

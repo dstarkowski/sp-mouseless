@@ -1,4 +1,4 @@
-function navigate(scope, url, modifier) {
+function navigate(scope, url) {
 	if (typeof(unsafeWindow._spPageContextInfo) != 'undefined') {
 		var webUrl = getScopeUrl(scope);
 		window.location = webUrl + url;
@@ -17,4 +17,4 @@ function getScopeUrl(scope) {
 	return ''; 
 }
 
-navigate(self.options.scope, self.options.url, self.options.modifier);
+navigate(self.options.scope, self.options.url);
