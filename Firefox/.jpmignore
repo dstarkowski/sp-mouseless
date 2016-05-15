@@ -1,0 +1,13 @@
+node_modules/*
+typings/*
+
+*.tsx
+*.js.map
+*.zip
+*.xpi
+
+typings.json
+tsconfig.json
+.jpmignore
+
+run.ps1
