@@ -19,54 +19,80 @@ var data = [
 	"web users"
 ];
 
-interface SearchBoxProps { data: string[]; }
+interface ISuggestion { _name: string }
+interface SearchBoxProps { suggestions: ISuggestion[]; }
+interface SuggestionListProps { suggestions: ISuggestion[]; }
+interface SuggestionItemProps { data: ISuggestion; }
 
-class SearchBox extends React.Component<SearchBoxProps, {}> {
+class SearchBox extends React.Component<{}, SearchBoxProps> {
 	constructor(props : SearchBoxProps, context? : any) {
 		super(props, context)
 		
-		self.port.on('show', () => {
-			var input = ReactDOM.findDOMNode(this.refs['input']) as HTMLInputElement;
-			input.focus();
-			input.select();
-		});
-		
+		self.port.on('show', () => this.onShow());
+		self.port.on('suggestions-ready', (args: ISuggestion[]) => this.onSuggestionsReady(args));
+	}
+	
+	private onShow() {
+		let input = ReactDOM.findDOMNode(this.refs['input']) as HTMLInputElement;
+		input.focus();
+		input.select();
+	}
+	
+	private onSuggestionsReady(args: ISuggestion[]) {
+		this.setState({suggestions : args});
+	}
+	
+	getInitialState() {
+		let suggestions : ISuggestion[] = [];  
+		return { suggestions: suggestions };
+	}
+
+	componentDidMount() {
+		self.port.emit('text-changed', '');
 	}
 	
 	onKeyUp(event : KeyboardEvent) {
+		let input = event.target as HTMLInputElement;
+		let text = input.value;
+
 		if (event.keyCode == 13) {
-			let input = event.target as HTMLInputElement;
-			let text = input.value;
 			self.port.emit('text-entered', text);
+			self.port.emit('text-changed', '');
 			input.value = '';
+		}
+		else {
+			self.port.emit('text-changed', text);
 		}
 	}
 
 	render() {
+		if (this.state == null) {
+			return (
+				<div>
+					<input id="spm-input" ref="input" onKeyUp={this.onKeyUp} />
+				</div>
+			);
+		}
 		return (
 			<div>
 				<input id="spm-input" ref="input" onKeyUp={this.onKeyUp} />
-				<SuggestionList data={this.props.data} />
+				<SuggestionList suggestions={this.state.suggestions} />
 			</div>
 		);
 	}
 }
 
-interface SuggestionItemProps { data: string; }
-
 class SuggestionItem extends React.Component<SuggestionItemProps, {}> {
 	render () {
 		return (
-			<li>{this.props.data}</li>
+			<li>{this.props.data._name}</li>
 		);
 	}
 }
 
-interface SuggestionListProps { data: string[]; }
-
 class SuggestionList extends React.Component<SuggestionListProps, {}> {
 	render () {
-		var suggestionItems = this.props.data.map(function(item) {
+		var suggestionItems = this.props.suggestions.map(function(item) {
 			return (
 				<SuggestionItem data={item} />
 			);
@@ -80,6 +106,6 @@ class SuggestionList extends React.Component<SuggestionListProps, {}> {
 }
 
 ReactDOM.render(
-	<SearchBox data={data} />,
+	<SearchBox />,
 	document.getElementById('spm-root')
 );

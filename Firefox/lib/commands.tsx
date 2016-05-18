@@ -61,7 +61,7 @@ export class NavigationCommands {
 		
 		for (let command of NavigationCommands._commands) {
 			let add = true;
-			for (let word in words) {
+			for (let word of words) {
 				if (command.name.indexOf(word) < 0) {
 					add = false;
 					break;
@@ -73,6 +73,6 @@ export class NavigationCommands {
 			}
 		}
 		
-		return selected;
+		return selected.sort((a, b) => a.name.localeCompare(b.name));
 	}
 }

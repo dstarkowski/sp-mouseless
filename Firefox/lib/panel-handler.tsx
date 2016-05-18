@@ -31,8 +31,8 @@ export class PanelHandler {
 		this.emit('show');
 	}
 	
-	public emit(eventName : string) {
-		this._panel.port.emit(eventName);
+	public emit(eventName : string, args?: any) {
+		this._panel.port.emit(eventName, args);
 	}
 	
 	public on(eventName : string, callback : Function) {
