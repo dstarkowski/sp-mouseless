@@ -1,11 +1,33 @@
 input {
 	width: 100%;
 }
-li {
-	list-style: none;
-	margin: 0;
-}
-ul {
+
+.suggestion-list {
 	margin: 0;
 	padding: 0;
+}
+
+.suggestion-item {
+	list-style: none;
+	margin: 0px;
+	padding: 2px;
+}
+
+.suggestion-item:nth-child(2n) {
+	background: #fafafa;
+}
+
+.suggestion-item.selected {
+	background: #def;
+	border: 1 solid #cde;
+}
+
+.suggestion-item .suggestion-name {
+	display: block;
+	color: #000;
+}
+
+.suggestion-item .suggestion-url {
+	display: block;
+	color: #666;
 }

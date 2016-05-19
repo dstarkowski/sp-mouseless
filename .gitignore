@@ -3,3 +3,4 @@ run.ps1
 /Firefox/lib/*.js
 /Firefox/data/*.js
 *js.map
+*.xpi

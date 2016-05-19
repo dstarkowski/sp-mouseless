@@ -19,7 +19,7 @@ var data = [
 	"web users"
 ];
 
-interface ISuggestion { _name: string }
+interface ISuggestion { _name: string, _scope: string, _url: string, _selected: boolean }
 interface SearchBoxProps { suggestions: ISuggestion[]; }
 interface SuggestionListProps { suggestions: ISuggestion[]; }
 interface SuggestionItemProps { data: ISuggestion; }
@@ -30,7 +30,13 @@ class SearchBox extends React.Component<{}, SearchBoxProps> {
 		
 		self.port.on('show', () => this.onShow());
 		self.port.on('suggestions-ready', (args: ISuggestion[]) => this.onSuggestionsReady(args));
+		
+		this._suggestions = [];
+		this._suggestionPosition = -1;
 	}
+	
+	private _suggestions : ISuggestion[];
+	private _suggestionPosition : number;
 	
 	private onShow() {
 		let input = ReactDOM.findDOMNode(this.refs['input']) as HTMLInputElement;
@@ -39,7 +45,24 @@ class SearchBox extends React.Component<{}, SearchBoxProps> {
 	}
 	
 	private onSuggestionsReady(args: ISuggestion[]) {
+		this._suggestions = args;
+		this._suggestionPosition = -1;
+
+		if (args.length > 0) {
+			this._suggestionPosition = 0;
+		}
+		
+		this.markSelectedSuggestion();
+
 		this.setState({suggestions : args});
+	}
+	
+	markSelectedSuggestion() {
+		for (let suggestion of this._suggestions) {
+			suggestion._selected = false;
+		}
+		
+		this._suggestions[this._suggestionPosition]._selected = true;
 	}
 	
 	getInitialState() {
@@ -51,31 +74,65 @@ class SearchBox extends React.Component<{}, SearchBoxProps> {
 		self.port.emit('text-changed', '');
 	}
 	
-	onKeyUp(event : KeyboardEvent) {
+	onKey(event : KeyboardEvent) {
+		switch (event.keyCode) {
+			case 13:
+				this.onKeyEnter(event);
+				break;
+			case 38:
+				this.onNavigate(event, -1);
+				break;
+			case 40:
+				this.onNavigate(event, +1);
+				break;
+			default:
+				this.onKeyOther(event);
+				break;
+		}
+	}
+	
+	onKeyEnter(event : KeyboardEvent) {
+		var command = this._suggestions[this._suggestionPosition];
+
+		self.port.emit('text-entered', command._name);
+		self.port.emit('text-changed', '');
+
+		let input = event.target as HTMLInputElement;
+		input.value = '';
+	}
+	
+	onNavigate(event : KeyboardEvent, direction : number) {
+		if (this._suggestions.length > 0) {
+			let position = this._suggestionPosition + direction;
+			position = Math.max(position, 0);
+			position = Math.min(position, this._suggestions.length - 1)
+			
+			this._suggestionPosition = position;
+			this.markSelectedSuggestion();
+			this.setState({ suggestions: this._suggestions });
+		}
+
+		event.defaultPrevented = true;
+	}
+	
+	onKeyOther(event : KeyboardEvent) {
 		let input = event.target as HTMLInputElement;
 		let text = input.value;
 
-		if (event.keyCode == 13) {
-			self.port.emit('text-entered', text);
-			self.port.emit('text-changed', '');
-			input.value = '';
-		}
-		else {
-			self.port.emit('text-changed', text);
-		}
+		self.port.emit('text-changed', text);
 	}
 
 	render() {
 		if (this.state == null) {
 			return (
 				<div>
-					<input id="spm-input" ref="input" onKeyUp={this.onKeyUp} />
+					<input id="spm-input" ref="input" onKeyUp={(e : KeyboardEvent) => this.onKey(e)} />
 				</div>
 			);
 		}
 		return (
 			<div>
-				<input id="spm-input" ref="input" onKeyUp={this.onKeyUp} />
+				<input id="spm-input" ref="input" onKeyUp={(e : KeyboardEvent) => this.onKey(e)} />
 				<SuggestionList suggestions={this.state.suggestions} />
 			</div>
 		);
@@ -85,7 +142,10 @@ class SearchBox extends React.Component<{}, SearchBoxProps> {
 class SuggestionItem extends React.Component<SuggestionItemProps, {}> {
 	render () {
 		return (
-			<li>{this.props.data._name}</li>
+			<li className={this.props.data._selected ? 'suggestion-item selected' : 'suggestion-item'}>
+				<span className='suggestion-name'>{this.props.data._name}</span>
+				<span className='suggestion-url'>({this.props.data._scope}){this.props.data._url}</span>
+			</li>
 		);
 	}
 }
@@ -98,7 +158,7 @@ class SuggestionList extends React.Component<SuggestionListProps, {}> {
 			);
 		});
 		return (
-			<ul>
+			<ul className='suggestion-list'>
 				{suggestionItems}
 			</ul>
 		);

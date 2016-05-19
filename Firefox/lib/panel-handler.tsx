@@ -15,9 +15,9 @@ export class PanelHandler {
 				'./react-dom.js',
 				'./panel-content.js',
 			],
-			width: 400,
+			width: 500,
 			height: 280,
-			position: { top: 0 },
+			position: { top: -5 },
 			onShow: () => this.onShow() 
 		});
 		
