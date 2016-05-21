@@ -23,6 +23,7 @@ export class NavigationCommand {
 
 export class NavigationCommands {
 	private static _commands : NavigationCommand[] = [
+		new NavigationCommand('tab', '', 'opens in new tab'),
 		new NavigationCommand('site contents', 'web', '/_layouts/viewlsts.aspx'),
 		new NavigationCommand('root web', 'site', '/'),
 		new NavigationCommand('root site', 'global', '/'),

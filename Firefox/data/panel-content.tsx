@@ -20,7 +20,7 @@ var data = [
 ];
 
 interface ISuggestion { _name: string, _scope: string, _url: string, _selected: boolean }
-interface SearchBoxProps { suggestions: ISuggestion[]; }
+interface SearchBoxProps { suggestions: ISuggestion[]; modifier: string }
 interface SuggestionListProps { suggestions: ISuggestion[]; }
 interface SuggestionItemProps { data: ISuggestion; }
 
@@ -30,18 +30,27 @@ class SearchBox extends React.Component<{}, SearchBoxProps> {
 		
 		self.port.on('show', () => this.onShow());
 		self.port.on('suggestions-ready', (args: ISuggestion[]) => this.onSuggestionsReady(args));
+		self.port.on('modifier-ready', (modifier: string) => this.onModifierReady(modifier));
 		
 		this._suggestions = [];
 		this._suggestionPosition = -1;
+		this._modifier = '';
 	}
 	
 	private _suggestions : ISuggestion[];
 	private _suggestionPosition : number;
+	private _modifier: string;
 	
 	private onShow() {
 		let input = ReactDOM.findDOMNode(this.refs['input']) as HTMLInputElement;
 		input.focus();
 		input.select();
+	}
+	
+	private onModifierReady(modifier: string) {
+		this._modifier = modifier;
+		
+		this.setState({suggestions: this._suggestions, modifier: this._modifier});
 	}
 	
 	private onSuggestionsReady(args: ISuggestion[]) {
@@ -54,7 +63,7 @@ class SearchBox extends React.Component<{}, SearchBoxProps> {
 		
 		this.markSelectedSuggestion();
 
-		this.setState({suggestions : args});
+		this.setState({suggestions: args, modifier: this._modifier});
 	}
 	
 	markSelectedSuggestion() {
@@ -67,7 +76,7 @@ class SearchBox extends React.Component<{}, SearchBoxProps> {
 	
 	getInitialState() {
 		let suggestions : ISuggestion[] = [];  
-		return { suggestions: suggestions };
+		return { suggestions: suggestions, modifier: this._modifier };
 	}
 
 	componentDidMount() {
@@ -109,7 +118,7 @@ class SearchBox extends React.Component<{}, SearchBoxProps> {
 			
 			this._suggestionPosition = position;
 			this.markSelectedSuggestion();
-			this.setState({ suggestions: this._suggestions });
+			this.setState({ suggestions: this._suggestions, modifier: this._modifier });
 		}
 
 		event.defaultPrevented = true;
@@ -126,13 +135,14 @@ class SearchBox extends React.Component<{}, SearchBoxProps> {
 		if (this.state == null) {
 			return (
 				<div>
-					<input id="spm-input" ref="input" onKeyUp={(e : KeyboardEvent) => this.onKey(e)} />
+					<input id='spm-input' ref='input' onKeyUp={(e : KeyboardEvent) => this.onKey(e)} />
 				</div>
 			);
 		}
 		return (
 			<div>
-				<input id="spm-input" ref="input" onKeyUp={(e : KeyboardEvent) => this.onKey(e)} />
+				<input id='spm-input' ref='input' onKeyUp={(e : KeyboardEvent) => this.onKey(e)} />
+				<div className='suggestion-modifier'>{this.state.modifier}</div>
 				<SuggestionList suggestions={this.state.suggestions} />
 			</div>
 		);

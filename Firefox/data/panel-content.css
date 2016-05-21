@@ -31,3 +31,9 @@ input {
 	display: block;
 	color: #666;
 }
+
+.suggestion-modifier {
+	color: #246;
+	margin: 1px 0;
+	font-size: 0.9em;
+}

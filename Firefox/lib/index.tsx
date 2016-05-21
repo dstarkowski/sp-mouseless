@@ -36,17 +36,32 @@ class Extension {
 	}
 	
 	private onTextEntered(commandText: string) {
-		var navigationCommand = NavigationCommands.getCommand(commandText);
-
-		if (typeof (navigationCommand) != 'undefined') {
-			var tab = Tabs.activeTab;
-			var context = this._tabContext[tab.id];
-			
-			var webUrl = this.getScopeUrl(navigationCommand.scope, context);
-			tab.url = webUrl + navigationCommand.url;
+		if (commandText.toLowerCase().trim() == 'tab') {
+			this._modifier = 'tab';
+			this._panel.emit('modifier-ready', 'tab');
 		}
+		else {
+			let navigationCommand = NavigationCommands.getCommand(commandText);
 
-		this._panel.toggle();
+			if (typeof (navigationCommand) != 'undefined') {
+				let tab = Tabs.activeTab;
+				let context = this._tabContext[tab.id];
+				
+				let webUrl = this.getScopeUrl(navigationCommand.scope, context);
+				
+				if (this._modifier == 'tab') {
+					Tabs.open(webUrl + navigationCommand.url);
+				}
+				else {
+					tab.url = webUrl + navigationCommand.url;
+				}
+
+				this._modifier = '';
+				this._panel.emit('modifier-ready', '');
+			}
+
+			this._panel.toggle();
+		}
 	}
 	
 	private onTextChanged(text: string) {
