@@ -9,8 +9,9 @@
 	"files": [
 		"./typings/main.d.ts",
 		"./data/panel-content.tsx",
-		"./lib/commands.tsx",
+		"./lib/interfaces.ts",
+		"./lib/commands.ts",
 		"./lib/index.tsx",
-		"./lib/panel-handler.tsx"
+		"./lib/panel-handler.ts"
 	]
 }
