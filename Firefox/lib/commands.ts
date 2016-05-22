@@ -64,23 +64,21 @@ export class ModifierCommand extends CommandBase {
 	}
 	
 	public execute(context: ITabContext, modifier: string) {
-		if (modifier == 'tab') {
+		if (modifier == this._name) {
 			return '';
 		}
 
-		return 'tab';
+		return this._name;
 	}
 }
 
-export class NavigationCommand extends CommandBase {
-	constructor(name: string, scope: string, url: string) {
-		super(name);
-		this._scope = scope;
+export abstract class NavigationCommandBase extends CommandBase {
+	constructor(name: string, url: string) {
+		super(name)
 		this._url = url;
 	}
-
-	private _scope : string;
-	private _url: string;
+	
+	protected _url: string;
 	
 	public canExecute(context: ITabContext): boolean {
 		return context.isSharePoint;
@@ -91,11 +89,16 @@ export class NavigationCommand extends CommandBase {
 		return new CommandSuggestion(this._name, 'Navigation', url);
 	}
 	
+	protected abstract getFullUrl(context: ITabContext): string;
+	
 	public execute(context: ITabContext, modifier: string): string {
 		var url = this.getFullUrl(context);
 		
 		if (modifier == 'tab') {
-			Tabs.open(url);
+			Tabs.open({ url: url, inBackground: false });
+		}		
+		else if (modifier == 'bgtab') {
+			Tabs.open({ url: url, inBackground: true });
 		}
 		else {
 			Tabs.activeTab.url = url;
@@ -103,8 +106,17 @@ export class NavigationCommand extends CommandBase {
 		
 		return '';
 	}
+}
+
+export class NavigationCommand extends NavigationCommandBase {
+	constructor(name: string, scope: string, url: string) {
+		super(name, url);
+		this._scope = scope;
+	}
+
+	private _scope : string;
 	
-	private getFullUrl(context: ITabContext): string {
+	protected getFullUrl(context: ITabContext): string {
 		if (this._scope == 'web') {
 			return context.spPageContextInfo.webAbsoluteUrl + this._url;
 		}
@@ -116,13 +128,37 @@ export class NavigationCommand extends CommandBase {
 	}
 }
 
+export class ListNavigationCommand extends NavigationCommandBase {
+	public canExecute(context: ITabContext) {
+		if (!context.isSharePoint) {
+			return false;
+		}
+		
+		return typeof(context.ctx) != 'undefined';
+	}
+	
+	protected getFullUrl(context: ITabContext): string {
+		let webUrl = context.spPageContextInfo.webAbsoluteUrl;
+		let listId = context.ctx.listName;
+		let viewId = context.ctx.view;
+		
+		let url = this._url;
+		url = url.replace('{web}', webUrl);
+		url = url.replace('{listId}', listId);
+		url = url.replace('{viewId}', viewId);
+		
+		return url;
+	}
+}
+
 export class NavigationCommands {
 	private static _commands : CommandBase[] = [
 		new ModifierCommand('tab', 'Executes next command in new tab.'),
+		new ModifierCommand('bgtab', 'Executes next command in new tab opened in background.'),
 		new NavigationCommand('site contents', 'web', '/_layouts/viewlsts.aspx'),
 		new NavigationCommand('root web', 'site', '/'),
 		new NavigationCommand('root site', 'global', '/'),
-		new NavigationCommand('settings', 'web', '/_layouts/settings.aspx'),
+		new NavigationCommand('web settings', 'web', '/_layouts/settings.aspx'),
 		new NavigationCommand('web features', 'web', '/_layouts/managefeatures.aspx'),
 		new NavigationCommand('site features', 'site', '/_layouts/managefeatures.aspx?Scope=Site'),
 		new NavigationCommand('home page', 'web', '/'),
@@ -133,6 +169,11 @@ export class NavigationCommands {
 		new NavigationCommand('web users', 'web', '/_layouts/user.aspx'),
 		new NavigationCommand('web columns', 'web', '/_layouts/mngfield.aspx'),
 		new NavigationCommand('web content types', 'web', '/_layouts/mngctype.aspx'),
+		new ListNavigationCommand('list settings', '{web}/_layouts/15/listedit.aspx?List={listId}'),
+		new ListNavigationCommand('list permissions', '{web}/_layouts/15/user.aspx?obj={listId},doclib&List={listId}'),
+		new ListNavigationCommand('add view', '{web}/_layouts/15/viewtype.aspx?List={listId}'),
+		new ListNavigationCommand('edit view', '{web}/_layouts/15/viewedit.aspx?List={listId}&View={viewId}'),
+		new ListNavigationCommand('add item', '{web}/_layouts/15/listform.aspx?PageType=8&ListId={listId}&RootFolder=')
 	];
 	
 	public static getCommand(input : string, context: ITabContext) : CommandBase {
@@ -154,10 +195,19 @@ export class NavigationCommands {
 			}
 		}
 		
-		return selected.sort(NavigationCommands.compareCommands);
+		return selected.sort((a, b) => NavigationCommands.compareCommands(a, b, input));
 	}
 	
-	public static compareCommands(a: CommandSuggestion, b: CommandSuggestion): number {
+	public static compareCommands(a: CommandSuggestion, b: CommandSuggestion, input: string): number {
+		input = input.trim().replace('  ', ' ').toLowerCase();
+		
+		if (a.name == input) {
+			return -1;
+		}
+		if (b.name == input) {
+			return 1;
+		}
+		
 		if (a.type == 'Modifier' && b.type != 'Modifier') {
 			return -1;
 		}

@@ -15,9 +15,10 @@ export interface ISPPageContext {
 }
 
 export interface ISPListContext {
-	listName: string; // {00000000-0000-0000-0000-0000000000000},
+	listName: string; // {00000000-0000-0000-0000-0000000000000}
 	ListTitle: string;
 	listUrlDir: string; // /site/lists/listUrl
+	view: string; // {00000000-0000-0000-0000-0000000000000}
 }
 
 export interface ITabContext {
