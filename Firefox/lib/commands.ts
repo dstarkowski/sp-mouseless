@@ -1,29 +1,124 @@
-export class NavigationCommand {
-	constructor(name: string, scope: string, url: string) {
+declare function require(name: string): any;
+var Tabs = require('sdk/tabs');
+
+import { ITabContext } from './interfaces.ts'
+
+export class CommandSuggestion {
+	constructor(name: string, type: string, description: string) {
+		this.name = name;
+		this.type = type;
+		this.description = description;
+	}
+	
+	name: string;
+	type: string;
+	description: string;
+}
+
+export abstract class CommandBase {
+	constructor(name: string) {
 		this._name = name;
+	}
+
+	protected _name: string;
+
+	public abstract getSuggestion(context: ITabContext): CommandSuggestion;
+	public abstract canExecute(context: ITabContext): boolean;
+	public abstract execute(context: ITabContext, modifier: string): string;
+
+	public isNameMatch(input: string): boolean {
+		return this._name == this.normalizeInput(input);
+	}
+
+	public isSuggestionMatch(input: string): boolean {
+		let words = this.normalizeInput(input).split(' ');
+		
+		for (let word of words) {
+			if (this._name.indexOf(word) < 0) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	protected normalizeInput(input: string): string {
+		return input.trim().replace('  ', ' ').toLowerCase();
+	}
+}
+
+export class ModifierCommand extends CommandBase {
+	constructor(name: string, description: string) {
+		super(name);
+		this._description = description;
+	}
+	
+	private _description: string;
+	
+	public canExecute(): boolean {
+		return true;
+	}
+	
+	public getSuggestion(context: ITabContext): CommandSuggestion {
+		return new CommandSuggestion(this._name, 'Modifier', this._description);
+	}
+	
+	public execute(context: ITabContext, modifier: string) {
+		if (modifier == 'tab') {
+			return '';
+		}
+
+		return 'tab';
+	}
+}
+
+export class NavigationCommand extends CommandBase {
+	constructor(name: string, scope: string, url: string) {
+		super(name);
 		this._scope = scope;
 		this._url = url;
 	}
-	
+
 	private _scope : string;
-	public get scope() : string {
-		return this._scope;
-	}
-	
-	private _name : string;
-	public get name() : string {
-		return this._name;
-	}
-	
 	private _url: string;
-	public get url() : string {
+	
+	public canExecute(context: ITabContext): boolean {
+		return context.isSharePoint;
+	}
+	
+	public getSuggestion(context: ITabContext): CommandSuggestion {
+		var url = this.getFullUrl(context);
+		return new CommandSuggestion(this._name, 'Navigation', url);
+	}
+	
+	public execute(context: ITabContext, modifier: string): string {
+		var url = this.getFullUrl(context);
+		
+		if (modifier == 'tab') {
+			Tabs.open(url);
+		}
+		else {
+			Tabs.activeTab.url = url;
+		}
+		
+		return '';
+	}
+	
+	private getFullUrl(context: ITabContext): string {
+		if (this._scope == 'web') {
+			return context.spPageContextInfo.webAbsoluteUrl + this._url;
+		}
+		if (this._scope == 'site') {
+			return context.spPageContextInfo.siteAbsoluteUrl + this._url;
+		}
+		
 		return this._url;
 	}
 }
 
 export class NavigationCommands {
-	private static _commands : NavigationCommand[] = [
-		new NavigationCommand('tab', '', 'opens in new tab'),
+	private static _commands : CommandBase[] = [
+		new ModifierCommand('tab', 'Executes next command in new tab.'),
 		new NavigationCommand('site contents', 'web', '/_layouts/viewlsts.aspx'),
 		new NavigationCommand('root web', 'site', '/'),
 		new NavigationCommand('root site', 'global', '/'),
@@ -40,15 +135,9 @@ export class NavigationCommands {
 		new NavigationCommand('web content types', 'web', '/_layouts/mngctype.aspx'),
 	];
 	
-	private static normalizeInput(input : string) : string {
-		return input.trim().replace('  ', ' ').toLowerCase();
-	}
-	
-	public static getCommand(input : string) : NavigationCommand {
-		let commandName = this.normalizeInput(input);
-		
+	public static getCommand(input : string, context: ITabContext) : CommandBase {
 		for (let command of NavigationCommands._commands) {
-			if (command.name == commandName) {
+			if (command.canExecute(context) && command.isNameMatch(input)) {
 				return command;
 			}
 		}
@@ -56,24 +145,27 @@ export class NavigationCommands {
 		return null;
 	}
 	
-	public static getSuggestions(input : string) : NavigationCommand[] {
-		let words = this.normalizeInput(input).split(' ')
-		let selected : NavigationCommand[] = []
+	public static getSuggestions(input: string, context: ITabContext) : CommandSuggestion[] {
+		let selected : CommandSuggestion[] = []
 		
 		for (let command of NavigationCommands._commands) {
-			let add = true;
-			for (let word of words) {
-				if (command.name.indexOf(word) < 0) {
-					add = false;
-					break;
-				}
-			}
-
-			if (add) {
-				selected.push(command);
+			if (command.canExecute(context) && command.isSuggestionMatch(input)) {
+				selected.push(command.getSuggestion(context));
 			}
 		}
 		
-		return selected.sort((a, b) => a.name.localeCompare(b.name));
+		return selected.sort(NavigationCommands.compareCommands);
+	}
+	
+	public static compareCommands(a: CommandSuggestion, b: CommandSuggestion): number {
+		if (a.type == 'Modifier' && b.type != 'Modifier') {
+			return -1;
+		}
+		
+		if (b.type == 'Modifier' && a.type != 'Modifier') {
+			return 1;
+		}
+		
+		return a.name.localeCompare(b.name);
 	}
 }

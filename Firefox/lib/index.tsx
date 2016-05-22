@@ -10,6 +10,10 @@ class Extension {
 	private _modifier: string;
 	private _panel: PanelHandler;
 	private _tabContext: TabContextCollection;
+	
+	private get currentContext(): ITabContext {
+		return this._tabContext[Tabs.activeTab.id];
+	}
 
 	constructor() {
 		this._modifier = '';
@@ -36,38 +40,22 @@ class Extension {
 	}
 	
 	private onTextEntered(commandText: string) {
-		if (commandText.toLowerCase().trim() == 'tab') {
-			this._modifier = 'tab';
-			this._panel.emit('modifier-ready', 'tab');
+		let command = NavigationCommands.getCommand(commandText, this.currentContext);
+
+		if (typeof (command) != 'undefined') {
+			this._modifier = command.execute(this.currentContext, this._modifier);
+			this._panel.emit('modifier-ready', this._modifier);
 		}
-		else {
-			let navigationCommand = NavigationCommands.getCommand(commandText);
 
-			if (typeof (navigationCommand) != 'undefined') {
-				let tab = Tabs.activeTab;
-				let context = this._tabContext[tab.id];
-				
-				let webUrl = this.getScopeUrl(navigationCommand.scope, context);
-				
-				if (this._modifier == 'tab') {
-					Tabs.open(webUrl + navigationCommand.url);
-				}
-				else {
-					tab.url = webUrl + navigationCommand.url;
-				}
-
-				this._modifier = '';
-				this._panel.emit('modifier-ready', '');
-			}
-
-			this._panel.toggle();
-		}
+		this._panel.toggle();
 	}
 	
 	private onTextChanged(text: string) {
-		var commands = NavigationCommands.getSuggestions(text);
-		
-		this._panel.emit('suggestions-ready', commands);
+		let context = this.currentContext;
+		if (typeof(context) != 'undefined') {
+			var commands = NavigationCommands.getSuggestions(text, context);
+			this._panel.emit('suggestions-ready', commands);
+		}
 	}
 
 	private invokeScript(tab: any, scriptFile: string, options: any) : any {

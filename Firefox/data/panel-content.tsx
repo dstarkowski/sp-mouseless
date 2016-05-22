@@ -19,7 +19,7 @@ var data = [
 	"web users"
 ];
 
-interface ISuggestion { _name: string, _scope: string, _url: string, _selected: boolean }
+interface ISuggestion { name: string, type: string, description: string, selected: boolean }
 interface SearchBoxProps { suggestions: ISuggestion[]; modifier: string }
 interface SuggestionListProps { suggestions: ISuggestion[]; }
 interface SuggestionItemProps { data: ISuggestion; }
@@ -68,10 +68,10 @@ class SearchBox extends React.Component<{}, SearchBoxProps> {
 	
 	markSelectedSuggestion() {
 		for (let suggestion of this._suggestions) {
-			suggestion._selected = false;
+			suggestion.selected = false;
 		}
 		
-		this._suggestions[this._suggestionPosition]._selected = true;
+		this._suggestions[this._suggestionPosition].selected = true;
 	}
 	
 	getInitialState() {
@@ -103,7 +103,7 @@ class SearchBox extends React.Component<{}, SearchBoxProps> {
 	onKeyEnter(event : KeyboardEvent) {
 		var command = this._suggestions[this._suggestionPosition];
 
-		self.port.emit('text-entered', command._name);
+		self.port.emit('text-entered', command.name);
 		self.port.emit('text-changed', '');
 
 		let input = event.target as HTMLInputElement;
@@ -152,9 +152,9 @@ class SearchBox extends React.Component<{}, SearchBoxProps> {
 class SuggestionItem extends React.Component<SuggestionItemProps, {}> {
 	render () {
 		return (
-			<li className={this.props.data._selected ? 'suggestion-item selected' : 'suggestion-item'}>
-				<span className='suggestion-name'>{this.props.data._name}</span>
-				<span className='suggestion-url'>({this.props.data._scope}){this.props.data._url}</span>
+			<li className={this.props.data.selected ? 'suggestion-item selected' : 'suggestion-item'}>
+				<span className='suggestion-name'>{this.props.data.name}</span>
+				<span className='suggestion-url'>{this.props.data.type}: {this.props.data.description}</span>
 			</li>
 		);
 	}
