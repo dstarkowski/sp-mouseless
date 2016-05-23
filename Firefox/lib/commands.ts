@@ -170,7 +170,7 @@ export class NavigationCommands {
 		new NavigationCommand('web columns', 'web', '/_layouts/mngfield.aspx'),
 		new NavigationCommand('web content types', 'web', '/_layouts/mngctype.aspx'),
 		new ListNavigationCommand('list settings', '{web}/_layouts/15/listedit.aspx?List={listId}'),
-		new ListNavigationCommand('list permissions', '{web}/_layouts/15/user.aspx?obj={listId},doclib&List={listId}'),
+		new ListNavigationCommand('list permissions', '{web}/_layouts/15/user.aspx?obj={listId},doclib'),
 		new ListNavigationCommand('add view', '{web}/_layouts/15/viewtype.aspx?List={listId}'),
 		new ListNavigationCommand('edit view', '{web}/_layouts/15/viewedit.aspx?List={listId}&View={viewId}'),
 		new ListNavigationCommand('add item', '{web}/_layouts/15/listform.aspx?PageType=8&ListId={listId}&RootFolder=')

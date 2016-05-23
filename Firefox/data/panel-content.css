@@ -30,6 +30,9 @@ input {
 .suggestion-item .suggestion-url {
 	display: block;
 	color: #666;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .suggestion-modifier {
