@@ -1,0 +1,53 @@
+body {
+	background: #FFF;
+}
+
+input {
+	width: 100%;
+	background: #FFF;
+	height: 28px;
+	border: 1px solid #8AC;
+	color: #111;
+	box-sizing: border-box;
+	padding-left: 5px;
+	margin-bottom: 2px;
+}
+
+.suggestion-list {
+	margin: 0;
+	padding: 0;
+}
+
+.suggestion-item {
+	list-style: none;
+	margin: 0px;
+	padding: 2px;
+	border: 1px solid transparent;
+}
+
+.suggestion-item:nth-child(2n) {
+	background: #F0F4FA;
+}
+
+.suggestion-item.selected {
+	border: 1px solid #8AC;
+}
+
+.suggestion-item .suggestion-name {
+	display: block;
+	color: #000;
+}
+
+.suggestion-item .suggestion-url {
+	display: block;
+	color: #666;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.suggestion-modifier {
+	color: #246;
+	margin: 1px 0;
+	font-size: 0.9em;
+}

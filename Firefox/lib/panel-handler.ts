@@ -1,5 +1,6 @@
 declare function require(name: string): any;
 
+var preferences = require('sdk/simple-prefs')
 var panels = require('sdk/panel');
 var { Hotkey } = require('sdk/hotkeys');
 
@@ -8,6 +9,9 @@ export class PanelHandler {
 	private _hotkey: any;
 	
 	constructor() {
+		let theme = preferences.prefs['theme'];
+		let styleFile = theme == 0 ? './light.css' : './dark.css';
+		
 		this._panel = panels.Panel({
 			contentURL: './panel-content.htm',
 			contentScriptFile: [
@@ -15,6 +19,7 @@ export class PanelHandler {
 				'./react-dom.js',
 				'./panel-content.js',
 			],
+			contentStyleFile: styleFile,
 			width: 550,
 			height: 280,
 			position: { top: -5 },

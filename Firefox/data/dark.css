@@ -1,5 +1,16 @@
+body {
+	background: #171B1F;
+}
+
 input {
 	width: 100%;
+	background: #171B1F;
+	height: 28px;
+	border: 1px solid #456;
+	color: #AAA;
+	box-sizing: border-box;
+	padding-left: 5px;
+	margin-bottom: 2px;
 }
 
 .suggestion-list {
@@ -11,32 +22,32 @@ input {
 	list-style: none;
 	margin: 0px;
 	padding: 2px;
+	border: 1px solid transparent;
 }
 
 .suggestion-item:nth-child(2n) {
-	background: #fafafa;
+	background: #202831;
 }
 
 .suggestion-item.selected {
-	background: #def;
-	border: 1 solid #cde;
+	border: 1px solid #456;
 }
 
 .suggestion-item .suggestion-name {
 	display: block;
-	color: #000;
+	color: #EEE;
 }
 
 .suggestion-item .suggestion-url {
 	display: block;
-	color: #666;
+	color: #999;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
 
 .suggestion-modifier {
-	color: #246;
+	color: #68A;
 	margin: 1px 0;
 	font-size: 0.9em;
 }

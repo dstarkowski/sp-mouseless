@@ -2,23 +2,6 @@ declare var self : any;
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-var data = [
-	"home page",
-	"permission levels",
-	"root site",
-	"root web",
-	"settings",
-	"site contents",
-	"site features",
-	"site settings",
-	"web columns",
-	"web content types",
-	"web features",
-	"web groups",
-	"web permissions",
-	"web users"
-];
-
 interface ISuggestion { name: string, type: string, description: string, selected: boolean }
 interface SearchBoxProps { suggestions: ISuggestion[]; modifier: string }
 interface SuggestionListProps { suggestions: ISuggestion[]; }
