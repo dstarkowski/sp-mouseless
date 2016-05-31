@@ -109,43 +109,34 @@ export abstract class NavigationCommandBase extends CommandBase {
 }
 
 export class NavigationCommand extends NavigationCommandBase {
-	constructor(name: string, scope: string, url: string) {
-		super(name, url);
-		this._scope = scope;
-	}
-
-	private _scope : string;
-	
-	protected getFullUrl(context: ITabContext): string {
-		if (this._scope == 'web') {
-			return context.spPageContextInfo.webAbsoluteUrl + this._url;
-		}
-		if (this._scope == 'site') {
-			return context.spPageContextInfo.siteAbsoluteUrl + this._url;
-		}
-		
-		return this._url;
-	}
-}
-
-export class ListNavigationCommand extends NavigationCommandBase {
 	public canExecute(context: ITabContext) {
 		if (!context.isSharePoint) {
 			return false;
 		}
 		
-		return typeof(context.ctx) != 'undefined';
+		if (NavigationCommand.listRegex.test(this._url)) {
+			return typeof(context.ctx) != 'undefined';
+		}
+		
+		return true;
 	}
 	
+	private static listRegex = /{(listId|viewId)}/i;
+	
 	protected getFullUrl(context: ITabContext): string {
-		let webUrl = context.spPageContextInfo.webAbsoluteUrl;
-		let listId = context.ctx.listName;
-		let viewId = context.ctx.view;
-		
 		let url = this._url;
-		url = url.replace('{web}', webUrl);
-		url = url.replace('{listId}', listId);
-		url = url.replace('{viewId}', viewId);
+		
+		let webUrl = context.spPageContextInfo.webAbsoluteUrl;
+		let siteUrl = context.spPageContextInfo.siteAbsoluteUrl;
+		url = url.replace(/{webUrl}/gi, webUrl);
+		url = url.replace(/{siteUrl}/gi, siteUrl);
+
+		if (NavigationCommand.listRegex.test(url)) {
+			let listId = context.ctx.listName;
+			let viewId = context.ctx.view;
+			url = url.replace(/{listId}/gi, listId);
+			url = url.replace(/{viewId}/gi, viewId);
+		}
 		
 		return url;
 	}
@@ -155,25 +146,25 @@ export class NavigationCommands {
 	private static _commands : CommandBase[] = [
 		new ModifierCommand('tab', 'Executes next command in new tab.'),
 		new ModifierCommand('bgtab', 'Executes next command in new tab opened in background.'),
-		new NavigationCommand('site contents', 'web', '/_layouts/viewlsts.aspx'),
-		new NavigationCommand('root web', 'site', '/'),
-		new NavigationCommand('root site', 'global', '/'),
-		new NavigationCommand('web settings', 'web', '/_layouts/settings.aspx'),
-		new NavigationCommand('web features', 'web', '/_layouts/managefeatures.aspx'),
-		new NavigationCommand('site features', 'site', '/_layouts/managefeatures.aspx?Scope=Site'),
-		new NavigationCommand('home page', 'web', '/'),
-		new NavigationCommand('site settings', 'site', '/_layouts/settings.aspx'),
-		new NavigationCommand('web permissions', 'web', '/_layouts/user.aspx'),
-		new NavigationCommand('permission levels', 'web', '/_layouts/role.aspx'),
-		new NavigationCommand('web groups', 'web', '/_layouts/groups.aspx'),
-		new NavigationCommand('web users', 'web', '/_layouts/user.aspx'),
-		new NavigationCommand('web columns', 'web', '/_layouts/mngfield.aspx'),
-		new NavigationCommand('web content types', 'web', '/_layouts/mngctype.aspx'),
-		new ListNavigationCommand('list settings', '{web}/_layouts/15/listedit.aspx?List={listId}'),
-		new ListNavigationCommand('list permissions', '{web}/_layouts/15/user.aspx?obj={listId},doclib'),
-		new ListNavigationCommand('add view', '{web}/_layouts/15/viewtype.aspx?List={listId}'),
-		new ListNavigationCommand('edit view', '{web}/_layouts/15/viewedit.aspx?List={listId}&View={viewId}'),
-		new ListNavigationCommand('add item', '{web}/_layouts/15/listform.aspx?PageType=8&ListId={listId}&RootFolder=')
+		new NavigationCommand('site contents', '{webUrl}/_layouts/viewlsts.aspx'),
+		new NavigationCommand('root web', '{siteUrl}/'),
+		new NavigationCommand('root site', '/'),
+		new NavigationCommand('web settings', '{webUrl}/_layouts/settings.aspx'),
+		new NavigationCommand('web features', '{webUrl}/_layouts/managefeatures.aspx'),
+		new NavigationCommand('site features', '{siteUrl}/_layouts/managefeatures.aspx?Scope=Site'),
+		new NavigationCommand('home page', '{webUrl}/'),
+		new NavigationCommand('site settings', '{siteUrl}/_layouts/settings.aspx'),
+		new NavigationCommand('web permissions', '{webUrl}/_layouts/user.aspx'),
+		new NavigationCommand('permission levels', '{webUrl}/_layouts/role.aspx'),
+		new NavigationCommand('web groups', '{webUrl}/_layouts/groups.aspx'),
+		new NavigationCommand('web users', '{webUrl}/_layouts/user.aspx'),
+		new NavigationCommand('web columns', '{webUrl}/_layouts/mngfield.aspx'),
+		new NavigationCommand('web content types', '{webUrl}/_layouts/mngctype.aspx'),
+		new NavigationCommand('list settings', '{webUrl}/_layouts/15/listedit.aspx?List={listId}'),
+		new NavigationCommand('list permissions', '{webUrl}/_layouts/15/user.aspx?obj={listId},doclib'),
+		new NavigationCommand('add view', '{webUrl}/_layouts/15/viewtype.aspx?List={listId}'),
+		new NavigationCommand('edit view', '{webUrl}/_layouts/15/viewedit.aspx?List={listId}&View={viewId}'),
+		new NavigationCommand('add item', '{webUrl}/_layouts/15/listform.aspx?PageType=8&ListId={listId}&RootFolder=')
 	];
 	
 	public static getCommand(input : string, context: ITabContext) : CommandBase {
