@@ -54,7 +54,9 @@ class SearchBox extends React.Component<{}, SearchBoxProps> {
 			suggestion.selected = false;
 		}
 		
-		this._suggestions[this._suggestionPosition].selected = true;
+		if (this._suggestions.length > 0) {
+			this._suggestions[this._suggestionPosition].selected = true;
+		}
 	}
 	
 	getInitialState() {
