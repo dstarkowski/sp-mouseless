@@ -85,6 +85,12 @@ class SearchBox extends React.Component<{}, SearchBoxProps> {
 		}
 	}
 	
+	preventKey(event : KeyboardEvent) {
+		if (event.keyCode == 38 || event.keyCode == 40) {
+			event.preventDefault();
+		}
+	}
+	
 	onKeyEnter(event : KeyboardEvent) {
 		var command = this._suggestions[this._suggestionPosition];
 
@@ -105,8 +111,6 @@ class SearchBox extends React.Component<{}, SearchBoxProps> {
 			this.markSelectedSuggestion();
 			this.setState({ suggestions: this._suggestions, modifier: this._modifier });
 		}
-
-		event.defaultPrevented = true;
 	}
 	
 	onKeyOther(event : KeyboardEvent) {
@@ -120,13 +124,13 @@ class SearchBox extends React.Component<{}, SearchBoxProps> {
 		if (this.state == null) {
 			return (
 				<div>
-					<input id='spm-input' ref='input' onKeyUp={(e : KeyboardEvent) => this.onKey(e)} />
+					<input id='spm-input' ref='input' onKeyUp={(e : KeyboardEvent) => this.onKey(e)} onKeyDown={(e : KeyboardEvent) => this.preventKey(e)} />
 				</div>
 			);
 		}
 		return (
 			<div>
-				<input id='spm-input' ref='input' onKeyUp={(e : KeyboardEvent) => this.onKey(e)} />
+				<input id='spm-input' ref='input' onKeyUp={(e : KeyboardEvent) => this.onKey(e)} onKeyDown={(e : KeyboardEvent) => this.preventKey(e)} />
 				<div className='suggestion-modifier'>{this.state.modifier}</div>
 				<SuggestionList suggestions={this.state.suggestions} />
 			</div>
