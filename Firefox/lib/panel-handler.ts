@@ -25,9 +25,10 @@ export class PanelHandler {
 			position: { top: -5 },
 			onShow: () => this.onShow() 
 		});
-		
+
+		let hotkey = preferences.prefs['hotkey'];		
 		this._hotkey = Hotkey({
-			combo: 'f1',
+			combo: hotkey,
 			onPress: () => this.toggle()
 		});
 	}

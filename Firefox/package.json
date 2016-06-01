@@ -8,21 +8,32 @@
   "engines": {
     "firefox": ">=38.0a1"
   },
-  "preferences": [{
-    "name": "theme",
-    "title": "Color theme",
-    "description": "Requires restart",
-    "type": "radio",
-    "value": 1,
-    "options": [{
-      "value": 0,
-      "label": "Light"
+  "preferences": [
+    {
+      "name": "theme",
+      "title": "Color theme",
+      "description": "Requires restart to take effect.",
+      "type": "radio",
+      "value": 1,
+      "options": [
+        {
+          "value": 0,
+          "label": "Light"
+        },
+        {
+          "value": 1,
+          "label": "Dark"
+        }
+      ]
     },
     {
-      "value": 1,
-      "label": "Dark"
-    }]
-  }],
+      "name": "hotkey",
+      "title": "Hotkey",
+      "description": "Keyboard shortcut to open commands panel. Example values: 'f1', 'control+q', 'control+alt+q'. Requires restart to take effect.",
+      "type": "string",
+      "value": "f1"
+    }
+  ],
   "license": "MIT",
   "permissions": {
     "private-browsing": true
