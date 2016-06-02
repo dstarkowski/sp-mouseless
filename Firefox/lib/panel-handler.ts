@@ -25,12 +25,24 @@ export class PanelHandler {
 			position: { top: -5 },
 			onShow: () => this.onShow() 
 		});
+		
+		this.initHotkey();
+		preferences.on('hotkey', () => this.initHotkey());
+	}
+	
+	private initHotkey() {
+		if (this._hotkey != null) {
+			this._hotkey.destroy();
+		}
 
-		let hotkey = preferences.prefs['hotkey'];		
-		this._hotkey = Hotkey({
-			combo: hotkey,
-			onPress: () => this.toggle()
-		});
+		let hotkey : string = preferences.prefs['hotkey'];
+		
+		if (/^(accel-|accel-alt-)(shift-)?(f\d{1,2}|\w)|f\d{1,2}$/.test(hotkey)) {
+			this._hotkey = Hotkey({
+				combo: hotkey,
+				onPress: () => this.toggle()
+			});
+		}
 	}
 	
 	private onShow() {

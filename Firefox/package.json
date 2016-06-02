@@ -29,7 +29,7 @@
     {
       "name": "hotkey",
       "title": "Hotkey",
-      "description": "Keyboard shortcut to open commands panel. Example values: 'f1', 'control+q', 'control+alt+q'. Requires restart to take effect.",
+      "description": "Keyboard shortcut to open commands panel. Must match:\n/^(accel-|accel-alt-)(shift-)?(f\\d{1,2}|\\w)|f\\d{1,2}$/",
       "type": "string",
       "value": "f1"
     }
