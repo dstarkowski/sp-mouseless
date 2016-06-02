@@ -1,7 +1,7 @@
 declare function require(name: string): any;
 
 import { ISPPageContext, ISPListContext, ITabContext, TabContextCollection } from './interfaces';
-import { NavigationCommand, NavigationCommands } from './commands';
+import { NavigationCommand, CommandsCollection } from './commands';
 import { PanelHandler } from './panel-handler';
 
 var Tabs = require('sdk/tabs');
@@ -10,6 +10,7 @@ class Extension {
 	private _modifier: string;
 	private _panel: PanelHandler;
 	private _tabContext: TabContextCollection;
+	private _commands: CommandsCollection;
 	
 	private get currentContext(): ITabContext {
 		return this._tabContext[Tabs.activeTab.id];
@@ -18,6 +19,7 @@ class Extension {
 	constructor() {
 		this._modifier = '';
 		this._tabContext = {};
+		this._commands = new CommandsCollection();
 		this._panel = new PanelHandler();
 		this._panel.on('text-entered', (text: string) => this.onTextEntered(text));
 		this._panel.on('text-changed', (text: string) => this.onTextChanged(text));
@@ -40,7 +42,7 @@ class Extension {
 	}
 	
 	private onTextEntered(commandText: string) {
-		let command = NavigationCommands.getCommand(commandText, this.currentContext);
+		let command = this._commands.getCommand(commandText, this.currentContext);
 
 		if (typeof (command) != 'undefined') {
 			this._modifier = command.execute(this.currentContext, this._modifier);
@@ -53,7 +55,7 @@ class Extension {
 	private onTextChanged(text: string) {
 		let context = this.currentContext;
 		if (typeof(context) != 'undefined') {
-			var commands = NavigationCommands.getSuggestions(text, context);
+			var commands = this._commands.getSuggestions(text, context);
 			this._panel.emit('suggestions-ready', commands);
 		}
 	}

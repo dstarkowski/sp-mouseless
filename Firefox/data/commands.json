@@ -1,0 +1,78 @@
+[
+	{
+		"name": "site contents",
+		"url": "{webUrl}/_layouts/viewlsts.aspx"
+	},
+	{
+		"name": "root web",
+		"url": "{siteUrl}/"
+	},
+	{
+		"name": "root site",
+		"url": "/"
+	},
+	{
+		"name": "web settings",
+		"url": "{webUrl}/_layouts/settings.aspx"
+	},
+	{
+		"name": "web features",
+		"url": "{webUrl}/_layouts/managefeatures.aspx"
+	},
+	{
+		"name": "site features",
+		"url": "{siteUrl}/_layouts/managefeatures.aspx?Scope=Site"
+	},
+	{
+		"name": "home page",
+		"url": "{webUrl}/"
+	},
+	{
+		"name": "site settings",
+		"url": "{siteUrl}/_layouts/settings.aspx"
+	},
+	{
+		"name": "web permissions",
+		"url": "{webUrl}/_layouts/user.aspx"
+	},
+	{
+		"name": "permission levels",
+		"url": "{webUrl}/_layouts/role.aspx"
+	},
+	{
+		"name": "web groups",
+		"url": "{webUrl}/_layouts/groups.aspx"
+	},
+	{
+		"name": "web users",
+		"url": "{webUrl}/_layouts/user.aspx"
+	},
+	{
+		"name": "web columns",
+		"url": "{webUrl}/_layouts/mngfield.aspx"
+	},
+	{
+		"name": "web content types",
+		"url": "{webUrl}/_layouts/mngctype.aspx"
+	},
+	{
+		"name": "list settings",
+		"url": "{webUrl}/_layouts/15/listedit.aspx?List={listId}"
+	},
+	{
+		"name": "list permissions",
+		"url": "{webUrl}/_layouts/15/user.aspx?obj={listId},doclib"
+	},
+	{
+		"name": "add view",
+		"url": "{webUrl}/_layouts/15/viewtype.aspx?List={listId}"
+	},
+	{
+		"name": "edit view",
+		"url": "{webUrl}/_layouts/15/viewedit.aspx?List={listId}&View={viewId}"
+	},
+	{
+		"name": "add item",
+		"url": "{webUrl}/_layouts/15/listform.aspx?PageType=8&ListId={listId}&RootFolder="
+	}
+]

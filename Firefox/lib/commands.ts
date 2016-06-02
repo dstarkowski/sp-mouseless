@@ -1,5 +1,7 @@
 declare function require(name: string): any;
 var Tabs = require('sdk/tabs');
+var storage = require('sdk/simple-storage').storage;
+var self = require('sdk/self');
 
 import { ITabContext } from './interfaces.ts'
 
@@ -142,33 +144,28 @@ export class NavigationCommand extends NavigationCommandBase {
 	}
 }
 
-export class NavigationCommands {
-	private static _commands : CommandBase[] = [
-		new ModifierCommand('tab', 'Executes next command in new tab.'),
-		new ModifierCommand('bgtab', 'Executes next command in new tab opened in background.'),
-		new NavigationCommand('site contents', '{webUrl}/_layouts/viewlsts.aspx'),
-		new NavigationCommand('root web', '{siteUrl}/'),
-		new NavigationCommand('root site', '/'),
-		new NavigationCommand('web settings', '{webUrl}/_layouts/settings.aspx'),
-		new NavigationCommand('web features', '{webUrl}/_layouts/managefeatures.aspx'),
-		new NavigationCommand('site features', '{siteUrl}/_layouts/managefeatures.aspx?Scope=Site'),
-		new NavigationCommand('home page', '{webUrl}/'),
-		new NavigationCommand('site settings', '{siteUrl}/_layouts/settings.aspx'),
-		new NavigationCommand('web permissions', '{webUrl}/_layouts/user.aspx'),
-		new NavigationCommand('permission levels', '{webUrl}/_layouts/role.aspx'),
-		new NavigationCommand('web groups', '{webUrl}/_layouts/groups.aspx'),
-		new NavigationCommand('web users', '{webUrl}/_layouts/user.aspx'),
-		new NavigationCommand('web columns', '{webUrl}/_layouts/mngfield.aspx'),
-		new NavigationCommand('web content types', '{webUrl}/_layouts/mngctype.aspx'),
-		new NavigationCommand('list settings', '{webUrl}/_layouts/15/listedit.aspx?List={listId}'),
-		new NavigationCommand('list permissions', '{webUrl}/_layouts/15/user.aspx?obj={listId},doclib'),
-		new NavigationCommand('add view', '{webUrl}/_layouts/15/viewtype.aspx?List={listId}'),
-		new NavigationCommand('edit view', '{webUrl}/_layouts/15/viewedit.aspx?List={listId}&View={viewId}'),
-		new NavigationCommand('add item', '{webUrl}/_layouts/15/listform.aspx?PageType=8&ListId={listId}&RootFolder=')
-	];
+export class CommandsCollection {
+	constructor() {
+		this._commands = []; 
+		this._commands.push(new ModifierCommand('tab', 'Executes next command in new tab.'));
+		this._commands.push(new ModifierCommand('bgtab', 'Executes next command in new tab opened in background.'));
 	
-	public static getCommand(input : string, context: ITabContext) : CommandBase {
-		for (let command of NavigationCommands._commands) {
+		this.loadCommands();
+	}
+
+	private _commands : CommandBase[];
+	
+	private loadCommands() {
+		let content = self.data.load('commands.json');
+		let json = JSON.parse(content);
+		
+		for (let item of json) {
+			this._commands.push(new NavigationCommand(item.name, item.url));
+		}
+	}
+	
+	public getCommand(input : string, context: ITabContext) : CommandBase {
+		for (let command of this._commands) {
 			if (command.canExecute(context) && command.isNameMatch(input)) {
 				return command;
 			}
@@ -177,19 +174,20 @@ export class NavigationCommands {
 		return null;
 	}
 	
-	public static getSuggestions(input: string, context: ITabContext) : CommandSuggestion[] {
+	public getSuggestions(input: string, context: ITabContext) : CommandSuggestion[] {
 		let selected : CommandSuggestion[] = []
 		
-		for (let command of NavigationCommands._commands) {
+		for (let command of this._commands) {
 			if (command.canExecute(context) && command.isSuggestionMatch(input)) {
 				selected.push(command.getSuggestion(context));
 			}
 		}
 		
-		return selected.sort((a, b) => NavigationCommands.compareCommands(a, b, input));
+		return selected.sort((a, b) => this.compareCommands(a, b, input));
 	}
 	
-	public static compareCommands(a: CommandSuggestion, b: CommandSuggestion, input: string): number {
+	public compareCommands(a: CommandSuggestion, b: CommandSuggestion, input: string): number {
+		//TODO: replace all
 		input = input.trim().replace('  ', ' ').toLowerCase();
 		
 		if (a.name == input) {
