@@ -1,10 +1,8 @@
-declare function require(name: string): any;
-
 import { ISPPageContext, ISPListContext, ITabContext, TabContextCollection } from './interfaces';
 import { NavigationCommand, CommandsCollection } from './commands';
 import { PanelHandler } from './panel-handler';
 
-var Tabs = require('sdk/tabs');
+var Tabs : FFTabs = require('sdk/tabs');
 
 class Extension {
 	private _modifier: string;
@@ -24,10 +22,10 @@ class Extension {
 		this._panel.on('text-entered', (text: string) => this.onTextEntered(text));
 		this._panel.on('text-changed', (text: string) => this.onTextChanged(text));
 
-		Tabs.on('ready', (tab: any) => this.onTabReady(tab));
+		Tabs.on('ready', (tab: FFTab) => this.onTabReady(tab));
 	}
 	
-	private onTabReady(tab: any) {
+	private onTabReady(tab: FFTab) {
 		let worker = tab.attach({
 			contentScriptFile: './context.js',
 			contentScriptOptions: { tabId: tab.id }
@@ -58,13 +56,6 @@ class Extension {
 			var commands = this._commands.getSuggestions(text, context);
 			this._panel.emit('suggestions-ready', commands);
 		}
-	}
-
-	private invokeScript(tab: any, scriptFile: string, options: any) : any {
-		return tab.attach({
-			contentScriptFile: scriptFile,
-			contentScriptOptions: options
-		});
 	}
 
 	private getScopeUrl(scope: string, context: ITabContext) {

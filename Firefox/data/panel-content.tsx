@@ -1,4 +1,4 @@
-declare var self : any;
+declare var self : FFSelf;
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 

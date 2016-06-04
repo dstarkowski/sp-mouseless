@@ -1,18 +1,16 @@
-declare function require(name: string): any;
-
-var preferences = require('sdk/simple-prefs')
-var panels = require('sdk/panel');
-var { Hotkey } = require('sdk/hotkeys');
+var preferences : FFSimplePrefs = require('sdk/simple-prefs')
+var { Panel } = require('sdk/panel');
+var { Hotkey } : FFHotkeys = require('sdk/hotkeys');
 
 export class PanelHandler {
-	private _panel : any;
-	private _hotkey: any;
+	private _panel : FFPanel;
+	private _hotkey: FFHotkey;
 	
 	constructor() {
 		let theme = preferences.prefs['theme'];
 		let styleFile = theme == 0 ? './light.css' : './dark.css';
 		
-		this._panel = panels.Panel({
+		this._panel = Panel({
 			contentURL: './panel-content.htm',
 			contentScriptFile: [
 				'./react.js',
@@ -53,7 +51,7 @@ export class PanelHandler {
 		this._panel.port.emit(eventName, args);
 	}
 	
-	public on(eventName : string, callback : Function) {
+	public on(eventName : string, callback : (options : any) => void) {
 		this._panel.port.on(eventName, callback);
 	}
 	

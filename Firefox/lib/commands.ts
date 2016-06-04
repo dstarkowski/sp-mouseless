@@ -1,7 +1,5 @@
-declare function require(name: string): any;
-var Tabs = require('sdk/tabs');
-var storage = require('sdk/simple-storage').storage;
-var self = require('sdk/self');
+var Tabs : FFTabs = require('sdk/tabs');
+var self : FFSelf = require('sdk/self');
 
 import { ITabContext } from './interfaces.ts'
 
