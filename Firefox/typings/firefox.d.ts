@@ -1,26 +1,26 @@
 declare function require(name: string): any;
 interface FFSimpleStorage {
-	Storage : any;
+	storage : any;
 }
 interface FFSelf {
 	data: FFSelfData;
 	port: FFPort;
+	options: any;
 }
 interface FFSelfData {
 	load(name: string) : string;
+	url(name: string) : string;
 }
 interface FFTabs {
 	activeTab : FFTab;
 	on(eventName : string, callback : (tab : FFTab) => void) : void;
-	open(options : FFTabOpenOptions) : void;
-}
-interface FFTabOpenOptions{
-	url: string;
-	inBackground: boolean;
+	open(options : { url: string, inBackground?: boolean, onReady?: any }) : void;
+	open(url: string) : void;
 }
 interface FFTab {
 	id : string;
-	attach(options : FFScriptAttachOptions) : FFScriptWorker;
+	attach(options : { contentScriptFile: string, contentScriptOptions: any }) : FFScriptWorker;
+	attach(options : { contentScriptFile: string[], contentScriptOptions: any }) : FFScriptWorker;
 	url : string; 
 }
 interface FFScriptWorker {
@@ -31,10 +31,6 @@ interface FFPort {
 	on(eventName : string, callback : (params : any) => any) : void;
 	emit(eventName : string) : void;
 	emit(eventName : string, params : any) : void;
-}
-interface FFScriptAttachOptions {
-	contentScriptFile : string;
-	contentScriptOptions : any;
 }
 interface FFSimplePrefs {
 	prefs: any;
@@ -50,10 +46,6 @@ interface FFHotkeys {
 	Hotkey : FFHotkey;
 }
 interface FFHotkey {
-	(options: FFHotkeyOptions) : FFHotkey;
+	(options: { combo: string, onPress() : void }) : FFHotkey;
 	destroy() : void;
-}
-interface FFHotkeyOptions {
-	combo: string;
-	onPress() : void; 
 }

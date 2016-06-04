@@ -1,5 +1,7 @@
 var Tabs : FFTabs = require('sdk/tabs');
 var self : FFSelf = require('sdk/self');
+var storage : FFSimpleStorage = require('sdk/simple-storage');
+var preferences : FFSimplePrefs = require('sdk/simple-prefs')
 
 import { ITabContext } from './interfaces.ts'
 
@@ -147,17 +149,45 @@ export class CommandsCollection {
 		this._commands = []; 
 		this._commands.push(new ModifierCommand('tab', 'Executes next command in new tab.'));
 		this._commands.push(new ModifierCommand('bgtab', 'Executes next command in new tab opened in background.'));
-	
-		this.loadCommands();
-	}
 
+		this.loadCommands();
+		
+		preferences.on('commands', this.openCommandsPage);
+	}
+	
+	private openCommandsPage() {
+		let a = this;
+		Tabs.open({
+            url: self.data.url('commands.html'),
+            onReady: function (tab : FFTab) {
+                var worker = tab.attach({
+                    contentScriptFile: [
+                        './react.js',
+                        './react-dom.js',
+                        './commands-content.js'],
+                    contentScriptOptions: { commands: storage.storage.commands }
+                });
+					worker.port.on('save', a.saveCommands);
+            }
+        });
+	}
+	
 	private _commands : CommandBase[];
 	
+	private saveCommands(commands : string) {
+		storage.storage.commands = commands;
+		this._commands = [];
+		this.loadCommands();
+	}
+	
 	private loadCommands() {
-		let content = self.data.load('commands.json');
-		let json = JSON.parse(content);
+		if (storage.storage.commands == null) {
+			storage.storage.commands = self.data.load('commands.json');
+		}
 		
-		for (let item of json) {
+		let commands = JSON.parse(storage.storage.commands);
+
+		for (let item of commands) {
 			this._commands.push(new NavigationCommand(item.name, item.url));
 		}
 	}

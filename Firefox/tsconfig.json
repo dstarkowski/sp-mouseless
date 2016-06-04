@@ -9,6 +9,7 @@
 	"files": [
 		"./typings/main.d.ts",
 		"./data/panel-content.tsx",
+		"./data/commands-content.tsx",
 		"./lib/interfaces.ts",
 		"./lib/commands.ts",
 		"./lib/index.tsx",

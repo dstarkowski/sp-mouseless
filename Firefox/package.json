@@ -32,6 +32,12 @@
       "description": "Keyboard shortcut to open commands panel. Must match:\n/^(accel-|accel-alt-)(shift-)?(f\\d{1,2}|\\w)|f\\d{1,2}$/",
       "type": "string",
       "value": "f1"
+    },
+    {
+      "name": "commands",
+      "type": "control",
+      "title": "Commands list",
+      "label": "Open commands configuration"
     }
   ],
   "license": "MIT",
