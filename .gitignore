@@ -1,6 +1,9 @@
 run.ps1
 /Firefox/node_modules/*
+/Firefox/lib/commands/*.js
 /Firefox/lib/*.js
-/Firefox/data/*.js
+/Firefox/data/configuration/*.js
+/Firefox/data/launcher/*.js
+!/Firefox/data/context.js
 *js.map
 *.xpi

@@ -2,7 +2,7 @@ var preferences : FFSimplePrefs = require('sdk/simple-prefs')
 var { Panel } = require('sdk/panel');
 var { Hotkey } : FFHotkeys = require('sdk/hotkeys');
 
-export class PanelHandler {
+export class LauncherPanel {
 	private _panel : FFPanel;
 	private _hotkey: FFHotkey;
 	
@@ -11,11 +11,11 @@ export class PanelHandler {
 		let styleFile = theme == 0 ? './light.css' : './dark.css';
 		
 		this._panel = Panel({
-			contentURL: './panel-content.htm',
+			contentURL: './launcher/launcher.html',
 			contentScriptFile: [
-				'./react.js',
-				'./react-dom.js',
-				'./panel-content.js',
+				'./libs/react.js',
+				'./libs/react-dom.js',
+				'./launcher/launcher.js',
 			],
 			contentStyleFile: styleFile,
 			width: 550,

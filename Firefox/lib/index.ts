@@ -1,12 +1,12 @@
 import { ISPPageContext, ISPListContext, ITabContext, TabContextCollection } from './interfaces';
-import { NavigationCommand, CommandsCollection } from './commands';
-import { PanelHandler } from './panel-handler';
+import { CommandsCollection } from './commands/commandCollection';
+import { LauncherPanel } from './launcherPanel';
 
 var Tabs : FFTabs = require('sdk/tabs');
 
 class Extension {
 	private _modifier: string;
-	private _panel: PanelHandler;
+	private _panel: LauncherPanel;
 	private _tabContext: TabContextCollection;
 	private _commands: CommandsCollection;
 	
@@ -18,7 +18,7 @@ class Extension {
 		this._modifier = '';
 		this._tabContext = {};
 		this._commands = new CommandsCollection();
-		this._panel = new PanelHandler();
+		this._panel = new LauncherPanel();
 		this._panel.on('text-entered', (text: string) => this.onTextEntered(text));
 		this._panel.on('text-changed', (text: string) => this.onTextChanged(text));
 

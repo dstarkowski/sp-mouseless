@@ -8,11 +8,13 @@
 	},
 	"files": [
 		"./typings/main.d.ts",
-		"./data/panel-content.tsx",
-		"./data/commands-content.tsx",
+		"./data/configuration/commands.tsx",
+		"./data/launcher/launcher.tsx",
 		"./lib/interfaces.ts",
-		"./lib/commands.ts",
-		"./lib/index.tsx",
-		"./lib/panel-handler.ts"
+		"./lib/commands/command.ts",
+		"./lib/commands/commandCollection.ts",
+		"./lib/commands/commandSuggestion.ts",
+		"./lib/index.ts",
+		"./lib/launcherPanel.ts"
 	]
 }
