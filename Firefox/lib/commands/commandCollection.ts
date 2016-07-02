@@ -10,9 +10,6 @@ import { CommandSuggestion } from './commandSuggestion'
 export class CommandsCollection {
 	constructor() {
 		this._commands = []; 
-		this._commands.push(new ModifierCommand('tab', 'Executes next command in new tab.'));
-		this._commands.push(new ModifierCommand('bgtab', 'Executes next command in new tab opened in background.'));
-
 		this.loadCommands();
 		
 		preferences.on('commands', () => this.openCommandsPage());
@@ -48,6 +45,9 @@ export class CommandsCollection {
 			storage.storage.commands = self.data.load('commands.json');
 		}
 		
+		this._commands.push(new ModifierCommand('tab', 'Executes next command in new tab.'));
+		this._commands.push(new ModifierCommand('bgtab', 'Executes next command in new tab opened in background.'));
+
 		let commands = JSON.parse(storage.storage.commands);
 
 		for (let item of commands) {
