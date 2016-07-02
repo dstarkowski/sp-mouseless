@@ -143,7 +143,7 @@ class SuggestionItem extends React.Component<SuggestionItemProps, {}> {
 		return (
 			<li className={this.props.data.selected ? 'suggestion-item selected' : 'suggestion-item'}>
 				<span className='suggestion-name'>{this.props.data.name}</span>
-				<span className='suggestion-url'>{this.props.data.type}: {this.props.data.description}</span>
+				<span className='suggestion-url'>{this.props.data.description}</span>
 			</li>
 		);
 	}

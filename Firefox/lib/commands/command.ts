@@ -48,7 +48,7 @@ export class ModifierCommand extends CommandBase {
 	}
 	
 	public getSuggestion(context: ITabContext): CommandSuggestion {
-		return new CommandSuggestion(this._name, 'Modifier', this._description);
+		return new CommandSuggestion(this._name, 'Modifier', 'Modifier: ' + this._description);
 	}
 	
 	public execute(context: ITabContext, modifier: string) {
