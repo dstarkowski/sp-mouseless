@@ -46,8 +46,9 @@ class Extension {
 			this._modifier = command.execute(this.currentContext, this._modifier);
 			this._panel.emit('modifier-ready', this._modifier);
 		}
-
-		this._panel.toggle();
+		if (!this._modifier) {
+			this._panel.toggle();
+		}
 	}
 	
 	private onTextChanged(text: string) {
