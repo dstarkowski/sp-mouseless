@@ -1,5 +1,5 @@
 import { ISPPageContext, ISPListContext, ITabContext, TabContextCollection } from './interfaces';
-import { CommandsCollection } from './commands/commandCollection';
+import { CommandStore } from './commands/commandCollection';
 import { LauncherPanel } from './launcherPanel';
 
 var Tabs : FFTabs = require('sdk/tabs');
@@ -8,16 +8,20 @@ class Extension {
 	private _modifier: string;
 	private _panel: LauncherPanel;
 	private _tabContext: TabContextCollection;
-	private _commands: CommandsCollection;
+	private _commands: CommandStore;
 	
 	private get currentContext(): ITabContext {
 		return this._tabContext[Tabs.activeTab.id];
 	}
 
+	private get currentUrl(): string {
+		return Tabs.activeTab.url;
+	}
+
 	constructor() {
 		this._modifier = '';
 		this._tabContext = {};
-		this._commands = new CommandsCollection();
+		this._commands = new CommandStore();
 		this._panel = new LauncherPanel();
 		this._panel.on('text-entered', (text: string) => this.onTextEntered(text));
 		this._panel.on('text-changed', (text: string) => this.onTextChanged(text));
@@ -40,7 +44,7 @@ class Extension {
 	}
 	
 	private onTextEntered(commandText: string) {
-		let command = this._commands.getCommand(commandText, this.currentContext);
+		let command = this._commands.getCommand(commandText);
 
 		if (typeof (command) != 'undefined') {
 			this._modifier = command.execute(this.currentContext, this._modifier);
@@ -54,7 +58,7 @@ class Extension {
 	private onTextChanged(text: string) {
 		let context = this.currentContext;
 		if (typeof(context) != 'undefined') {
-			var commands = this._commands.getSuggestions(text, context);
+			var commands = this._commands.getSuggestions(text, context, this.currentUrl);
 			this._panel.emit('suggestions-ready', commands);
 		}
 	}

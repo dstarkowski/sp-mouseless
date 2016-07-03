@@ -2,7 +2,7 @@ declare var self : FFSelf;
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-interface ISuggestion { name: string, type: string, description: string, selected: boolean }
+interface ISuggestion { uuid: string, name: string, type: string, description: string, selected: boolean }
 interface SearchBoxProps { suggestions: ISuggestion[]; modifier: string }
 interface SuggestionListProps { suggestions: ISuggestion[]; }
 interface SuggestionItemProps { data: ISuggestion; }
@@ -94,7 +94,7 @@ class SearchBox extends React.Component<{}, SearchBoxProps> {
 	onKeyEnter(event : KeyboardEvent) {
 		var command = this._suggestions[this._suggestionPosition];
 
-		self.port.emit('text-entered', command.name);
+		self.port.emit('text-entered', command.uuid);
 		self.port.emit('text-changed', '');
 
 		let input = event.target as HTMLInputElement;
